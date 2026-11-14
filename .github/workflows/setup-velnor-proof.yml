@@ -1,0 +1,57 @@
+name: setup-velnor proof
+on:
+  pull_request:
+permissions:
+  contents: read
+env:
+  ACTION_PIN: 636c5a35430db307d7df753cf04a247ee84e5a59
+jobs:
+  first-run:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        id: restore
+        with:
+          path: /opt/hostedtoolcache/velnor-ci
+          key: velnor-ci-proof-717-${{ github.run_id }}
+      - name: Install velnor-ci 0.1.79
+        uses: tailrocks/velnor-new/actions/setup-velnor@636c5a35430db307d7df753cf04a247ee84e5a59
+        with:
+          version: 0.1.79
+          sha256-linux-x64: a82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: /opt/hostedtoolcache/velnor-ci
+          key: velnor-ci-proof-717-${{ github.run_id }}
+      - name: Run velnor-ci
+        run: velnor-ci --version
+  second-run:
+    needs: first-run
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: /opt/hostedtoolcache/velnor-ci
+          key: velnor-ci-proof-717-${{ github.run_id }}
+          fail-on-cache-miss: true
+      - name: Install velnor-ci 0.1.79
+        uses: tailrocks/velnor-new/actions/setup-velnor@636c5a35430db307d7df753cf04a247ee84e5a59
+        with:
+          version: 0.1.79
+          sha256-linux-x64: a82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
+      - name: Run velnor-ci
+        run: velnor-ci --version
+  wrong-sha:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install velnor-ci 0.1.79 with a wrong SHA-256
+        id: wrong
+        continue-on-error: true
+        uses: tailrocks/velnor-new/actions/setup-velnor@636c5a35430db307d7df753cf04a247ee84e5a59
+        with:
+          version: 0.1.79
+          sha256-linux-x64: b82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
+      - name: Show that velnor-ci is not on PATH
+        run: |
+          echo "install outcome: ${{ steps.wrong.outcome }}"
+          command -v velnor-ci || echo "velnor-ci is not on PATH"
