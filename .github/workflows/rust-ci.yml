@@ -19,6 +19,11 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: false
+      - name: Restore the tool cache (proof only)
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: /opt/hostedtoolcache/velnor-ci
+          key: velnor-ci-tool-cache-proof-717
       - name: Install velnor-ci 0.1.79
         uses: tailrocks/velnor-new/actions/setup-velnor@1793cf84b5924e2542a03b0fb2580e7395b2f4cb  # rust-ci-v0.1.79
         with:
@@ -26,6 +31,13 @@ jobs:
           sha256-linux-x64: a82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
           sha256-linux-arm64: '05b16546fa0d95c67b61bd041e59dfbcda527ca89f9350ae75d5be3219eaf98b'
           sha256-macos-arm64: '91b0214fc2a5713bf7c962842636eecb899bbb052646a396818526e528a713f4'
+      - name: Save the tool cache (proof only)
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: /opt/hostedtoolcache/velnor-ci
+          key: velnor-ci-tool-cache-proof-717
+      - name: Run velnor-ci (proof only)
+        run: velnor-ci --version
       - name: Install tools
         uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c
         with:
