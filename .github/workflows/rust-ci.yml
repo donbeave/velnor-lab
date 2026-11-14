@@ -23,9 +23,12 @@ jobs:
         uses: tailrocks/velnor-new/actions/setup-velnor@1793cf84b5924e2542a03b0fb2580e7395b2f4cb  # rust-ci-v0.1.79
         with:
           version: '0.1.79'
-          sha256-linux-x64: a82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
+          sha256-linux-x64: b82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
           sha256-linux-arm64: '05b16546fa0d95c67b61bd041e59dfbcda527ca89f9350ae75d5be3219eaf98b'
           sha256-macos-arm64: '91b0214fc2a5713bf7c962842636eecb899bbb052646a396818526e528a713f4'
+      - name: Show whether velnor-ci is on PATH (proof only)
+        if: '${{ always() }}'
+        run: command -v velnor-ci || echo "velnor-ci is not on PATH"
       - name: Install tools
         uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c
         with:
@@ -79,7 +82,7 @@ jobs:
         uses: tailrocks/velnor-new/actions/setup-velnor@1793cf84b5924e2542a03b0fb2580e7395b2f4cb  # rust-ci-v0.1.79
         with:
           version: '0.1.79'
-          sha256-linux-x64: a82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
+          sha256-linux-x64: b82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386
           sha256-linux-arm64: '05b16546fa0d95c67b61bd041e59dfbcda527ca89f9350ae75d5be3219eaf98b'
           sha256-macos-arm64: '91b0214fc2a5713bf7c962842636eecb899bbb052646a396818526e528a713f4'
       - name: Install tools

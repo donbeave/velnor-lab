@@ -3,7 +3,7 @@ commit = "1793cf84b5924e2542a03b0fb2580e7395b2f4cb"
 
 [velnor-ci]
 linux-arm64 = "05b16546fa0d95c67b61bd041e59dfbcda527ca89f9350ae75d5be3219eaf98b"
-linux-x64 = "a82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386"
+linux-x64 = "b82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386"
 macos-arm64 = "91b0214fc2a5713bf7c962842636eecb899bbb052646a396818526e528a713f4"
 
 [velnor-gen]
