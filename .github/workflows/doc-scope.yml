@@ -73,12 +73,15 @@ jobs:
           FILE: ${{ matrix.file }}
           LINK: ${{ matrix.link }}
         run: |
-          if [ "$LINK" = yes ]; then
-            printf '\n/// See [`nowhere::Missing`].\npub fn marker() {}\n' >> "$FILE"
-          elif [ "$FILE" = app/src/main.rs ]; then
+          if [ "$FILE" = app/src/main.rs ]; then
             printf '\n// touched\n' >> "$FILE"
           else
-            printf '\n/// A marker.\npub fn marker() {}\n' >> "$FILE"
+            if [ "$LINK" = yes ]; then
+              block='/// See [`nowhere::Missing`].\npub fn marker() {}'
+            else
+              block='/// A marker.\npub fn marker() {}'
+            fi
+            awk -v b="$block" 'BEGIN { done = 0 } /^#\[cfg\(test\)\]/ && !done { printf "%s\n\n", b; done = 1 } { print }' "$FILE" > "$RUNNER_TEMP/edit.rs" && mv "$RUNNER_TEMP/edit.rs" "$FILE"
           fi
           git diff --name-only | tee "$RUNNER_TEMP/changed"
       - name: Plan
