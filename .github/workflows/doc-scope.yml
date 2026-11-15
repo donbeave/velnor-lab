@@ -1,0 +1,109 @@
+name: doc scope
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+env:
+  VELNOR_CI_REV: 1814aed9195e14cb946b47f8df76648e4b166e9a
+jobs:
+  helper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: tailrocks/velnor-new
+          ref: ${{ env.VELNOR_CI_REV }}
+          sparse-checkout: |
+            ci-helper
+            generator
+          persist-credentials: false
+      - run: cargo install --locked --path ci-helper/crates/velnor-ci --root "$RUNNER_TEMP/out"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: velnor-ci
+          path: ${{ runner.temp }}/out/bin/velnor-ci
+  scenario:
+    needs: helper
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: before-workspace
+            file: ''
+            link: ''
+            scoped: 'no'
+          - name: leaf-g149
+            file: grow/g149/src/lib.rs
+            link: ''
+            scoped: 'yes'
+          - name: middle-g120
+            file: grow/g120/src/lib.rs
+            link: ''
+            scoped: 'yes'
+          - name: app
+            file: app/src/main.rs
+            link: ''
+            scoped: 'yes'
+          - name: broken-link-g149
+            file: grow/g149/src/lib.rs
+            link: 'yes'
+            scoped: 'yes'
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: velnor-ci
+          path: ${{ runner.temp }}/helper
+      - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c
+        with:
+          version: '2026.11.1'
+          cache: false
+      - run: rustup component add clippy rustfmt
+      - name: Edit
+        if: matrix.file != ''
+        env:
+          FILE: ${{ matrix.file }}
+          LINK: ${{ matrix.link }}
+        run: |
+          if [ "$LINK" = yes ]; then
+            printf '\n/// See [`nowhere::Missing`].\npub fn marker() {}\n' >> "$FILE"
+          elif [ "$FILE" = app/src/main.rs ]; then
+            printf '\n// touched\n' >> "$FILE"
+          else
+            printf '\n/// A marker.\npub fn marker() {}\n' >> "$FILE"
+          fi
+          git diff --name-only | tee "$RUNNER_TEMP/changed"
+      - name: Plan
+        id: plan
+        if: matrix.scoped == 'yes'
+        run: |
+          chmod +x "$RUNNER_TEMP/helper/velnor-ci"
+          "$RUNNER_TEMP/helper/velnor-ci" plan --changed $(cat "$RUNNER_TEMP/changed")
+          echo "root: $(grep -E '^rust_root_(mode|package_args)=' "$GITHUB_OUTPUT" | cut -c1-200)"
+      - name: Lint
+        run: cargo-clippy clippy --workspace --all-targets --locked -- -D warnings
+      - name: Test
+        run: cargo-nextest nextest run --workspace --locked --no-fail-fast --ignore-default-filter -E 'all()'
+      - name: Documentation workspace
+        if: matrix.scoped == 'no'
+        run: |
+          start=$(date +%s.%N)
+          cargo doc --workspace --no-deps --locked --config 'build.rustdocflags=["-D","warnings"]' 2>&1 | tee "$RUNNER_TEMP/doc.log"
+          status=${PIPESTATUS[0]}
+          echo "RESULT scenario=${{ matrix.name }} status=$status seconds=$(echo "$(date +%s.%N) - $start" | bc) checking=$(grep -c '^ *Checking ' "$RUNNER_TEMP/doc.log") compiling=$(grep -c '^ *Compiling ' "$RUNNER_TEMP/doc.log") documenting=$(grep -c '^ *Documenting ' "$RUNNER_TEMP/doc.log")"
+          exit $status
+      - name: Documentation selected
+        if: matrix.scoped == 'yes'
+        run: |
+          start=$(date +%s.%N)
+          cargo doc --no-deps --locked --config 'build.rustdocflags=["-D","warnings"]' ${{ steps.plan.outputs.rust_root_package_args }} 2>&1 | tee "$RUNNER_TEMP/doc.log"
+          status=${PIPESTATUS[0]}
+          echo "RESULT scenario=${{ matrix.name }} status=$status seconds=$(echo "$(date +%s.%N) - $start" | bc) checking=$(grep -c '^ *Checking ' "$RUNNER_TEMP/doc.log") compiling=$(grep -c '^ *Compiling ' "$RUNNER_TEMP/doc.log") documenting=$(grep -c '^ *Documenting ' "$RUNNER_TEMP/doc.log")"
+          exit $status
