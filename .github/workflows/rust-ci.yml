@@ -37,9 +37,6 @@ jobs:
       - name: Test
         if: '${{ !cancelled() }}'
         run: 'cargo-nextest nextest run --workspace --locked --no-fail-fast --ignore-default-filter -E ''all()'''
-      - name: Test harness-lab custom
-        if: '${{ !cancelled() }}'
-        run: cargo test -p harness-lab --test custom --locked
       - name: Doctests
         if: '${{ !cancelled() }}'
         run: cargo test --doc --workspace --locked
