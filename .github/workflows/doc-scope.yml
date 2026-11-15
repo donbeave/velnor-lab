@@ -1,6 +1,7 @@
 name: doc scope
 on:
-  workflow_dispatch: {}
+  push:
+    branches: [lab/740-doc-scope]
 permissions:
   contents: read
 env:
