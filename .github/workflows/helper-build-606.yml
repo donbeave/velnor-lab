@@ -1,0 +1,28 @@
+name: helper build 606
+on:
+  push:
+    branches:
+      - lab/606-helper
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out velnor-new
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: tailrocks/velnor-new
+          ref: 3c3315a4faf1e4ec3afb573e2bfac56b5fb78685
+          path: src
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Install the toolchain
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Build velnor-ci
+        run: cargo +1.99.1 build --release --locked -p velnor-ci --manifest-path src/ci-helper/Cargo.toml
+      - name: Publish the binary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create 606-helper-3c3315a4fa src/ci-helper/target/release/velnor-ci --prerelease --title "velnor-ci for 606" --notes "velnor-ci built from velnor-new 3c3315a4faf1e4ec3afb573e2bfac56b5fb78685" --target ${{ github.sha }}
