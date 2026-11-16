@@ -1,1 +1,2 @@
 on_main = "everything"
+exclude = ["lab/"]
