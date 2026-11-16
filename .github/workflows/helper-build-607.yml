@@ -1,0 +1,29 @@
+name: helper build 612
+on:
+  push:
+    branches: [lab/612-helper]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: tailrocks/velnor-new
+          ref: peer/612-ci-report
+          persist-credentials: false
+      - uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c
+        with:
+          version: '2026.11.1'
+          install_args: rust
+          cache: false
+      - run: cargo build --manifest-path ci-helper/Cargo.toml --release --locked
+      - run: cargo build --manifest-path generator/Cargo.toml --release --locked -p velnor-gen
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: velnor-612-binaries
+          path: |
+            ci-helper/target/release/velnor-ci
+            generator/target/release/velnor-gen
+          retention-days: 1
