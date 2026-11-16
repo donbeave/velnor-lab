@@ -47,13 +47,10 @@ jobs:
             ~/.local/share/mise
             ~/.rustup
           key: 'velnor-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(''mise.lock'') }}'
-      - id: prepare
-        name: velnor-ci prepare
-        run: velnor-ci prepare
       - name: Show
         run: |
           echo "lockhash=${{ hashFiles('mise.lock') }} cache-hit=${{ steps.tools.outputs.cache-hit }}"
-          du -sh ~/.local/share/mise ~/.rustup ~/.cargo 2>/dev/null || true
+          du -sh ~/.local/share/mise/* ~/.rustup/* ~/.cargo 2>/dev/null || true
           ls ~/.local/share/mise ~/.local/share/mise/installs ~/.rustup/toolchains 2>&1 | head -30
   shard:
     runs-on: ubuntu-latest
