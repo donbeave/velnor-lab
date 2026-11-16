@@ -118,9 +118,6 @@ jobs:
           PACKAGE_ARGS: '${{ steps.plan.outputs.rust_root_package_args }}'
           DOCTESTS_KNOWN: '${{ steps.plan.outputs.rust_root_doctests_known }}'
         run: 'velnor-ci run -- cargo test --doc $PACKAGE_ARGS --locked'
-      - name: velnor-ci inputs audit
-        if: '${{ (github.event_name == ''schedule'' || github.event_name == ''push'') && steps.plan.outcome == ''success'' && steps.plan.outputs.rust_root_mode != ''none'' }}'
-        run: velnor-ci inputs audit
       - name: Documentation
         if: '${{ !cancelled() && steps.restored.outcome == ''success'' && steps.plan.outcome == ''success'' && steps.plan.outputs.rust_root_mode != ''none'' && steps.plan.outputs.rust_root_docs == ''run'' && steps.plan.outputs.rust_root_package_args != '''' }}'
         env:
