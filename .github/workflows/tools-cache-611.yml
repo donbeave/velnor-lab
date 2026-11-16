@@ -15,13 +15,13 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: false
-      - name: Install velnor-ci 0.1.79
-        uses: tailrocks/velnor-new/actions/setup-velnor@1793cf84b5924e2542a03b0fb2580e7395b2f4cb
+      - name: Install velnor-ci 0.1.80
+        uses: tailrocks/velnor-new/actions/setup-velnor@46f7a043952f82ef1a78d8ebb63143faca8f268c
         with:
-          version: '0.1.79'
-          sha256-linux-x64: 'a82f2edacbd781debf2da851d3b3380e81fce9fdec216c1101ca5ce91afe7386'
-          sha256-linux-arm64: '05b16546fa0d95c67b61bd041e59dfbcda527ca89f9350ae75d5be3219eaf98b'
-          sha256-macos-arm64: '91b0214fc2a5713bf7c962842636eecb899bbb052646a396818526e528a713f4'
+          version: '0.1.80'
+          sha256-linux-x64: '659a551f2dbc7cd34c745dce2a787717aa8b8214841e4b9f9fa3a6334ebe8e3c'
+          sha256-linux-arm64: 'de279a7db363cf6943489b379e2c9360786156245ba7a3ae0fc85467ea860c2c'
+          sha256-macos-arm64: '21015c7f0244d7fda84e36f26945ad11a811122b183224467ba4b8ed9bf68d51'
       - id: tools
         name: Restore the tools cache
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
@@ -47,6 +47,9 @@ jobs:
             ~/.local/share/mise
             ~/.rustup
           key: 'velnor-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles(''mise.lock'') }}'
+      - id: prepare
+        name: velnor-ci prepare
+        run: velnor-ci prepare
       - name: Show
         run: |
           echo "lockhash=${{ hashFiles('mise.lock') }} cache-hit=${{ steps.tools.outputs.cache-hit }}"
