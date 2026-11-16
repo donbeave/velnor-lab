@@ -25,4 +25,4 @@ jobs:
       - name: Publish the binary
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create 606-helper-3c3315a4fa src/ci-helper/target/release/velnor-ci --prerelease --title "velnor-ci for 606" --notes "velnor-ci built from velnor-new 3c3315a4faf1e4ec3afb573e2bfac56b5fb78685" --target ${{ github.sha }}
+        run: gh release create --repo tailrocks/velnor-lab 606-helper-3c3315a4fa src/ci-helper/target/release/velnor-ci --prerelease --title "velnor-ci for 606" --notes "velnor-ci built from velnor-new 3c3315a4faf1e4ec3afb573e2bfac56b5fb78685" --target ${{ github.sha }}
