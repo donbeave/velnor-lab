@@ -1,0 +1,4 @@
+default_branch = "main"
+on_main = "everything"
+full_run = "off"
+cache_check_blocks = true
