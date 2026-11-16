@@ -1,3 +1,4 @@
+# a comment only
 [tools]
 rust = { version = "1.99.1", profile = "minimal", components = [
   "clippy",
