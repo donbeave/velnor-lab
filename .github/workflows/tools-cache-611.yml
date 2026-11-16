@@ -1,5 +1,7 @@
 name: Tools cache 611
 on:
+  push:
+    branches: [lab/611-tools-cache]
   workflow_dispatch: {}
 permissions:
   contents: read
